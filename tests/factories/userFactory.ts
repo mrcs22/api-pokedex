@@ -2,9 +2,9 @@ import { getRepository } from "typeorm";
 import bcrypt from "bcrypt";
 import User from "../../src/entities/User";
 
-export async function createUser(): Promise<number> {
+export async function createUser(email?: string): Promise<number> {
   const user = {
-    email: "test@test.com",
+    email: email ? email : "test@test.com",
     password: bcrypt.hashSync("123456", 12),
   };
 
