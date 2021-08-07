@@ -24,14 +24,31 @@ export async function getAll(userId: number) {
   return allPokemonsWithUserOnesSinged;
 }
 
-export async function addToMyPokemons(userId: number, pokemonId: number) {
+export async function updateMyPokemons(
+  userId: number,
+  pokemonId: number,
+  action: string
+) {
   const pokemon = await getRepository(Pokemon).findOne({
     where: { id: pokemonId },
   });
 
   if (!pokemon) return false;
 
-  await getRepository(PokemonUser).insert({ userId, pokemonId });
+  if (action === "add") {
+    await getRepository(PokemonUser).insert({ userId, pokemonId });
+    return true;
+  }
 
-  return true;
+  if (action === "remove") {
+    const myPokemonRegister = await getRepository(PokemonUser).findOne({
+      where: { userId, pokemonId },
+    });
+
+    if (!myPokemonRegister) return false;
+
+    await getRepository(PokemonUser).delete({ userId, pokemonId });
+
+    return true;
+  }
 }

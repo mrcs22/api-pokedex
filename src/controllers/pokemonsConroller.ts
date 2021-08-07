@@ -19,12 +19,33 @@ export async function addToMyPokemons(req: Request, res: Response) {
     const userId = res.locals.autenticatedUserId;
     const pokemonId = parseInt(req.params.id);
 
-    const successAtAddingPokemon = await pokemonsService.addToMyPokemons(
+    const successAtAddingPokemon = await pokemonsService.updateMyPokemons(
       userId,
-      pokemonId
+      pokemonId,
+      "add"
     );
 
     if (!successAtAddingPokemon) return res.sendStatus(400);
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function removeFromMyPokemons(req: Request, res: Response) {
+  try {
+    const userId = res.locals.autenticatedUserId;
+    const pokemonId = parseInt(req.params.id);
+
+    const successAtRemovingPokemon = await pokemonsService.updateMyPokemons(
+      userId,
+      pokemonId,
+      "remove"
+    );
+
+    if (!successAtRemovingPokemon) return res.sendStatus(400);
 
     res.sendStatus(200);
   } catch (err) {

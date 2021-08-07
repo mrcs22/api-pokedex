@@ -25,6 +25,12 @@ app.post(
   pokemonsController.addToMyPokemons
 );
 
+app.post(
+  "/my-pokemons/:id/remove",
+  autenticate,
+  pokemonsController.removeFromMyPokemons
+);
+
 export async function init() {
   await connectDatabase();
 }
