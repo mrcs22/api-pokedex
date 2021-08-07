@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { getConnection } from "typeorm";
+import { getConnection, getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 import app, { init } from "../../src/app";
 import { createUser } from "../factories/userFactory";
@@ -7,6 +7,7 @@ import { clearDatabase } from "../utils/database";
 import { createPokemon } from "../factories/pokemonFactory";
 import createPokemonUser from "../factories/PokemonUserFacory";
 import Pokemon from "../../src/entities/Pokemon";
+import PokemonUser from "../../src/entities/PokemonUser";
 beforeAll(async () => {
   await init();
 });
@@ -28,11 +29,10 @@ describe("GET /pokemons", () => {
   it("returns status 401 for invalid token", async () => {
     const response = await supertest(app)
       .get("/pokemons")
-      .set({
-        Headers: {
-          Authorization: jwt.sign({ userId: 0 }, process.env.JWT_SECRET),
-        },
-      });
+      .set(
+        "Authorization",
+        `Bearer ${jwt.sign({ userId: 0 }, process.env.JWT_SECRET)}`
+      );
 
     expect(response.statusCode).toEqual(401);
   });
@@ -74,5 +74,50 @@ describe("GET /pokemons", () => {
 
     expect(countOfAllReceivedPokemons).toEqual(2);
     expect(countOfMyPokemons).toEqual(1);
+  });
+});
+
+describe("POST /my-pokemons/:id/add", () => {
+  it("return status 401 for no token", async () => {
+    const response = await supertest(app).post("/my-pokemons/2/add");
+
+    expect(response.statusCode).toEqual(401);
+  });
+
+  it("return status 200 for valid token and valid pokemon id", async () => {
+    const userId = await createUser();
+    const pokemonId = await createPokemon();
+
+    const response = await supertest(app)
+      .post(`/my-pokemons/${pokemonId}/add`)
+      .set(
+        "Authorization",
+        `Bearer ${jwt.sign({ userId }, process.env.JWT_SECRET)}`
+      );
+
+    expect(response.statusCode).toEqual(200);
+  });
+
+  it("adds a pokemon to my pokemons when valid request", async () => {
+    const userId = await createUser();
+    const pokemonId = await createPokemon();
+
+    const myPokemonsBeforeAdding = await getRepository(PokemonUser).find({
+      where: { userId },
+    });
+
+    const response = await supertest(app)
+      .post(`/my-pokemons/${pokemonId}/add`)
+      .set(
+        "Authorization",
+        `Bearer ${jwt.sign({ userId }, process.env.JWT_SECRET)}`
+      );
+
+    const myPokemonsAfterAdding = await getRepository(PokemonUser).find({
+      where: { userId },
+    });
+
+    expect(myPokemonsBeforeAdding.length).toEqual(0);
+    expect(myPokemonsAfterAdding.length).toEqual(1);
   });
 });

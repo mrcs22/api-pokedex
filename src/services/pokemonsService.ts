@@ -23,3 +23,15 @@ export async function getAll(userId: number) {
 
   return allPokemonsWithUserOnesSinged;
 }
+
+export async function addToMyPokemons(userId: number, pokemonId: number) {
+  const pokemon = await getRepository(Pokemon).findOne({
+    where: { id: pokemonId },
+  });
+
+  if (!pokemon) return false;
+
+  await getRepository(PokemonUser).insert({ userId, pokemonId });
+
+  return true;
+}

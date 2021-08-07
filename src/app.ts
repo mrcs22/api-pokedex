@@ -19,6 +19,12 @@ app.post("/sign-in", userController.signIn);
 
 app.get("/pokemons", autenticate, pokemonsController.listAll);
 
+app.post(
+  "/my-pokemons/:id/add",
+  autenticate,
+  pokemonsController.addToMyPokemons
+);
+
 export async function init() {
   await connectDatabase();
 }
