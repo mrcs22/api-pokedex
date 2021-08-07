@@ -6,7 +6,7 @@ import axios from "axios";
 async function populateDatabase() {
   await init();
 
-  const pokemonsAmount = 10;
+  const pokemonsAmount = 200;
   for (let i = 1; i <= pokemonsAmount; i++) {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
 
