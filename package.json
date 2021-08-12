@@ -9,7 +9,7 @@
     "start": "NODE_ENV=production NODE_TLS_REJECT_UNAUTHORIZED=0 node dist/src/server.js",
     "dev": "NODE_ENV=development npx nodemon --watch \"src/**\" --ext \"ts,json\" --exec \"ts-node src/server.ts\"",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "populateDatabase": "ts-node ./utils/populateDatabase.ts"
+    "populateDatabase": "NODE_ENV=production NODE_TLS_REJECT_UNAUTHORIZED=0 node ./dist/utils/populateDatabase.js "
   },
   "keywords": [],
   "author": "",
